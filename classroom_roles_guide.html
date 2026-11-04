@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>아자스반 의미있는 1인 1역 (Classroom Roles)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        skyBase: '#add8eb',
+                        pinkAccent: '#eec9c9',
+                        pinkHover: '#e5b6b6',
+                        slateDark: '#1e293b',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Noto Sans KR', 'Noto Sans SC', 'Noto Sans', sans-serif;
+            background: linear-gradient(135deg, #a4d4e9 0%, #e8f4f8 45%, #eec9c9 100%);
+            min-height: 100vh;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism Styling */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.55);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            box-shadow: 0 10px 30px 0 rgba(31, 38, 135, 0.08);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.58);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.75);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-6px) scale(1.01);
+            background: rgba(255, 255, 255, 0.82);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.12);
+            border-color: rgba(255, 255, 255, 0.95);
+        }
+
+        .glass-modal {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.95);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Ambient animated glass background blobs */
+        .blob {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(60px);
+            z-index: 0;
+            opacity: 0.55;
+            animation: float 14s infinite alternate ease-in-out;
+            pointer-events: none;
+        }
+
+        .blob-1 {
+            top: -5%;
+            left: -5%;
+            width: 380px;
+            height: 380px;
+            background: #add8eb;
+        }
+
+        .blob-2 {
+            bottom: 5%;
+            right: -5%;
+            width: 420px;
+            height: 420px;
+            background: #eec9c9;
+            animation-delay: -5s;
+        }
+
+        .blob-3 {
+            top: 40%;
+            left: 30%;
+            width: 300px;
+            height: 300px;
+            background: #d8b4fe;
+            animation-delay: -9s;
+            opacity: 0.35;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0px, 0px) scale(1); }
+            50% { transform: translate(30px, 40px) scale(1.08); }
+            100% { transform: translate(-20px, 20px) scale(0.95); }
+        }
+
+        /* Active "My Role" highlight frame */
+        .my-role-active {
+            border: 2.5px solid #eec9c9 !important;
+            box-shadow: 0 0 25px rgba(238, 201, 201, 0.9), 0 10px 25px rgba(0, 0, 0, 0.08) !important;
+            background: rgba(255, 255, 255, 0.88) !important;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(238, 201, 201, 0.8);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(229, 182, 182, 1);
+        }
+
+        .custom-checkbox:checked {
+            background-color: #eec9c9;
+            border-color: #eec9c9;
+        }
+    </style>
+</head>
+<body class="relative min-h-screen py-6 px-4 md:px-8 text-slate-800">
+
+    <!-- Ambient Floating Glass Blobs -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+    <!-- Main Container -->
+    <div class="relative z-10 max-w-7xl mx-auto">
+
+        <!-- Header -->
+        <header class="glass-panel rounded-3xl p-6 md:p-8 mb-8 border border-white/80">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                
+                <!-- Title & Subtitle -->
+                <div>
+                    <h1 id="appTitle" class="text-3xl md:text-4xl font-extrabold text-slate-800 tracking-tight mb-2">
+                        아자스반 의미있는 1인 1역
+                    </h1>
+                    <p id="appSubtitle" class="text-sm md:text-base font-medium text-slate-600">
+                        나의 책임으로 함께 만드는 멋진 우리 교실! 역할을 확인하고 책임감을 키워요 ✨
+                    </p>
+                </div>
+
+                <!-- Multilingual Language Selector & Teacher Mode Toggle -->
+                <div class="flex flex-wrap items-center gap-2 bg-white/60 p-1.5 rounded-2xl border border-white/80 shadow-sm self-start md:self-auto">
+                    <button onclick="setLanguage('ko')" id="langBtn-ko" class="lang-btn flex items-center gap-2 px-3 py-2 rounded-xl text-xs md:text-sm font-bold transition-all bg-[#eec9c9] text-slate-800 shadow-sm">
+                        <span>🇰🇷</span> 한국어
+                    </button>
+                    <button onclick="setLanguage('zh')" id="langBtn-zh" class="lang-btn flex items-center gap-2 px-3 py-2 rounded-xl text-xs md:text-sm font-bold transition-all text-slate-600 hover:bg-white/60">
+                        <span>🇨🇳</span> 中文
+                    </button>
+                    <button onclick="setLanguage('ru')" id="langBtn-ru" class="lang-btn flex items-center gap-2 px-3 py-2 rounded-xl text-xs md:text-sm font-bold transition-all text-slate-600 hover:bg-white/60">
+                        <span>🇷🇺</span> Русский
+                    </button>
+                    
+                    <!-- Google Form Application Link Button -->
+                    <a href="https://docs.google.com/forms/d/e/1FAIpQLSfQ_0-O9HMeP1HQif77kV2CYleffSeVLobXr6cblAde6CCfPQ/viewform?usp=header" target="_blank" rel="noopener noreferrer" id="applyFormHeaderBtn" class="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs md:text-sm font-bold transition-all bg-gradient-to-r from-pink-200 via-rose-200 to-[#eec9c9] text-pink-950 border border-pink-300 hover:shadow-md hover:scale-[1.02] shadow-sm ml-1">
+                        <span id="applyFormHeaderBtnText">📝 1인 1역 신청하기</span> <i class="fa-solid fa-arrow-up-right-from-square text-xs opacity-75"></i>
+                    </a>
+
+                    <!-- Teacher Mode Toggle Button -->
+                    <button onclick="toggleTeacherMode()" id="teacherToggleBtn" class="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs md:text-sm font-bold transition-all bg-amber-100 text-amber-900 border border-amber-300 hover:bg-amber-200 shadow-sm ml-1">
+                        <span id="teacherToggleIcon">⚙️</span> <span id="teacherToggleText">교사 모드</span>
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- Search & Category Filters Bar -->
+            <div class="mt-8 pt-6 border-t border-white/60 flex flex-col lg:flex-row gap-4 items-stretch lg:items-center justify-between">
+                
+                <!-- Category Tabs -->
+                <div class="flex flex-wrap items-center gap-2" id="categoryContainer">
+                    <button onclick="setCategory('all')" id="catBtn-all" class="cat-btn px-4 py-2 rounded-2xl text-xs md:text-sm font-bold transition-all bg-[#eec9c9] text-slate-800 shadow-sm">
+                        ✨ <span id="cat-all">전체 역할</span>
+                    </button>
+                    <button onclick="setCategory('alert')" id="catBtn-alert" class="cat-btn px-4 py-2 rounded-2xl text-xs md:text-sm font-bold transition-all bg-white/50 text-slate-700 hover:bg-white/80">
+                        🔔 <span id="cat-alert">알림 / 도움</span>
+                    </button>
+                    <button onclick="setCategory('cleaning')" id="catBtn-cleaning" class="cat-btn px-4 py-2 rounded-2xl text-xs md:text-sm font-bold transition-all bg-white/50 text-slate-700 hover:bg-white/80">
+                        🧹 <span id="cat-cleaning">청소 / 정리</span>
+                    </button>
+                </div>
+
+                <!-- Search Input -->
+                <div class="relative min-w-[260px]">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" id="searchInput" oninput="handleSearch()" placeholder="역할 이름 검색..." class="w-full pl-11 pr-4 py-2.5 bg-white/70 border border-white/90 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-[#eec9c9] placeholder:text-slate-400 transition-all">
+                </div>
+
+            </div>
+
+            <!-- Teacher Control Bar (Visible when Teacher Mode is ON) -->
+            <div id="teacherControlPanel" class="hidden mt-6 pt-5 border-t border-amber-200/80 flex flex-wrap items-center justify-between gap-3 bg-amber-50/80 p-4 rounded-2xl border border-amber-200 shadow-inner">
+                <div class="flex items-center gap-2 text-xs md:text-sm font-bold text-amber-900">
+                    <span class="text-base">⚙️</span> <span id="teacherPanelLabel">교사 관리 모드 활성화됨 (수정 및 삭제 가능)</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="openEditorModal(null)" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs md:text-sm rounded-xl transition-all shadow-sm flex items-center gap-1.5">
+                        <i class="fa-solid fa-plus"></i> <span id="addRoleBtnText">새 역할 추가</span>
+                    </button>
+                    <button onclick="confirmResetDefaults()" class="px-4 py-2 bg-slate-700 hover:bg-slate-800 text-white font-bold text-xs md:text-sm rounded-xl transition-all shadow-sm flex items-center gap-1.5">
+                        <i class="fa-solid fa-rotate-left"></i> <span id="resetDefaultsBtnText">기본 역할로 초기화</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Google Form Application Link Banner Card -->
+        <div class="glass-panel rounded-2xl p-4 md:p-5 mt-6 mb-6 bg-gradient-to-r from-blue-100/90 via-white/70 to-pink-100/90 border-2 border-[#add8eb]/80 shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3.5">
+                <div class="w-12 h-12 rounded-2xl bg-white/90 border border-white flex items-center justify-center text-2xl shadow-sm shrink-0">
+                    📋
+                </div>
+                <div>
+                    <h3 id="applyBannerTitle" class="text-base md:text-lg font-extrabold text-slate-800">
+                        1인 1역 희망 역할 신청하기
+                    </h3>
+                    <p id="applyBannerSub" class="text-xs md:text-sm font-medium text-slate-600">
+                        원하는 역할을 구글 폼으로 신청해 보세요!
+                    </p>
+                </div>
+            </div>
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSfQ_0-O9HMeP1HQif77kV2CYleffSeVLobXr6cblAde6CCfPQ/viewform?usp=header" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto px-5 py-2.5 bg-gradient-to-r from-[#eec9c9] to-pink-300 hover:from-[#e5b6b6] hover:to-pink-400 text-slate-800 font-extrabold text-xs md:text-sm rounded-xl transition-all shadow-md flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 shrink-0">
+                <span id="applyBannerBtnText">📝 신청하러 가기</span> <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+            </a>
+        </div>
+
+        <!-- Selected My Role Notification Banner (If user has selected a role) -->
+        <div id="myRoleBanner" class="hidden glass-panel rounded-2xl p-4 mb-8 bg-gradient-to-r from-white/70 via-white/50 to-[#eec9c9]/40 border-2 border-[#eec9c9]">
+            <div class="flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl animate-bounce">⭐</span>
+                    <div>
+                        <span class="text-xs font-bold text-pink-700 uppercase tracking-wider" id="myRoleBannerHeader">현재 나의 지정 역할</span>
+                        <h4 id="myRoleBannerTitle" class="text-base md:text-lg font-bold text-slate-800">역할이 선택됨</h4>
+                    </div>
+                </div>
+                <button onclick="openRoleDetail(currentMyRoleId)" class="px-4 py-2 bg-[#eec9c9] hover:bg-[#e5b6b6] text-slate-800 font-bold text-xs md:text-sm rounded-xl transition-all shadow-sm flex items-center gap-2">
+                    <i class="fa-solid fa-list-check"></i> <span id="myRoleBannerBtn">오늘 할 일 체크</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Role Cards Grid -->
+        <main>
+            <div id="rolesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Cards will be populated dynamically via JavaScript -->
+            </div>
+
+            <!-- Empty Search State -->
+            <div id="emptyState" class="hidden text-center py-16 glass-panel rounded-3xl">
+                <span class="text-5xl mb-4 block">🔍</span>
+                <h3 id="emptyStateTitle" class="text-xl font-bold text-slate-700 mb-2">검색 결과가 없습니다.</h3>
+                <p id="emptyStateSub" class="text-sm text-slate-500 mb-4">다른 키워드나 카테고리를 선택해 보세요!</p>
+                <button onclick="resetSearch()" class="px-4 py-2 bg-white/80 hover:bg-white text-slate-700 font-bold text-sm rounded-xl border border-white/90 shadow-sm transition-all">
+                    <span id="emptyStateResetBtn">검색 초기화</span>
+                </button>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="mt-12 text-center text-xs text-slate-500 font-medium pb-8">
+            <p>🏫 아자스반 의미있는 1인 1역 시스템 • Multilingual Support (KO / ZH / RU)</p>
+        </footer>
+
+    </div>
+
+    <!-- Glassmorphic Detail Modal -->
+    <div id="roleModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm hidden transition-opacity duration-300">
+        <div class="glass-modal rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 md:p-8 relative border border-white/80 shadow-2xl">
+            
+            <!-- Close Button -->
+            <button onclick="closeRoleDetail()" class="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/70 hover:bg-white text-slate-600 flex items-center justify-center text-lg transition-all shadow-sm">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <!-- Modal Header -->
+            <div class="flex items-center gap-4 mb-6">
+                <div id="modalIconContainer" class="w-16 h-16 md:w-20 md:h-20 rounded-3xl bg-gradient-to-br from-white/90 to-[#add8eb]/60 flex items-center justify-center text-3xl md:text-4xl shadow-inner border border-white">
+                    🧹
+                </div>
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span id="modalCategoryBadge" class="px-3 py-1 rounded-full text-xs font-bold bg-[#add8eb]/50 text-blue-900 border border-[#add8eb]">
+                            카테고리
+                        </span>
+                        <span id="modalCountBadge" class="px-3 py-1 rounded-full text-xs font-bold bg-pink-100 text-pink-800 border border-[#eec9c9]">
+                            👤 1명
+                        </span>
+                    </div>
+                    <h2 id="modalRoleTitle" class="text-2xl md:text-3xl font-extrabold text-slate-800">역할 이름</h2>
+                </div>
+            </div>
+
+            <!-- Progress Bar for Checklist -->
+            <div class="bg-white/60 p-4 rounded-2xl border border-white/90 mb-6">
+                <div class="flex items-center justify-between text-xs font-bold text-slate-700 mb-2">
+                    <span id="modalProgressLabel">오늘의 역할 달성률</span>
+                    <span id="modalProgressPercent">0%</span>
+                </div>
+                <div class="w-full h-3 bg-slate-200/60 rounded-full overflow-hidden p-0.5 border border-white/50">
+                    <div id="modalProgressBar" class="h-full bg-gradient-to-r from-[#add8eb] to-[#eec9c9] rounded-full transition-all duration-500 w-0"></div>
+                </div>
+            </div>
+
+            <!-- Tasks Checklist Section -->
+            <div class="mb-6">
+                <h3 id="modalTasksTitle" class="text-base font-extrabold text-slate-800 mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-clipboard-check text-[#eec9c9]"></i> 주요 역할 및 수행할 일
+                </h3>
+                <div id="modalTasksList" class="space-y-2.5">
+                    <!-- Dynamic task items -->
+                </div>
+            </div>
+
+            <!-- Tips Section -->
+            <div class="bg-gradient-to-r from-[#eec9c9]/30 to-[#add8eb]/30 p-4 md:p-5 rounded-2xl border border-white/80 mb-6">
+                <h4 id="modalTipHeader" class="text-xs font-bold text-pink-700 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                    <i class="fa-solid fa-lightbulb"></i> 6학년 책임감 꿀팁
+                </h4>
+                <p id="modalTipBody" class="text-sm font-medium text-slate-700 leading-relaxed">
+                    우리 모두를 위한 책임감을 가지고 성실히 임해주세요!
+                </p>
+            </div>
+
+            <!-- Modal Action Footer -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-slate-200/50">
+                <button id="modalMyRoleToggleBtn" onclick="toggleMyRoleFromModal()" class="w-full sm:w-auto px-5 py-3 rounded-2xl font-bold text-sm transition-all flex items-center justify-center gap-2 bg-[#eec9c9] text-slate-800 hover:bg-[#e5b6b6] shadow-sm">
+                    <i class="fa-solid fa-star"></i> <span id="modalMyRoleBtnText">이 역할이 내 역할이에요!</span>
+                </button>
+                <button onclick="closeRoleDetail()" class="w-full sm:w-auto px-6 py-3 bg-white/80 hover:bg-white text-slate-700 font-bold text-sm rounded-2xl border border-white shadow-sm transition-all">
+                    <span id="modalCloseBtnText">닫기</span>
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Password Authentication Modal for Teacher Mode -->
+    <div id="passwordModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm hidden">
+        <div class="glass-modal rounded-3xl max-w-sm w-full p-6 text-center border border-white/90 shadow-2xl">
+            <div class="w-14 h-14 bg-amber-100 text-amber-800 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4 border border-amber-200">
+                🔑
+            </div>
+            <h3 class="text-xl font-extrabold text-slate-800 mb-2">교사 인증</h3>
+            <p class="text-xs text-slate-600 font-medium mb-4">교사 관리 모드로 전환하려면 암호를 입력해주세요.<br><span class="text-slate-400">(기본 암호: 1234)</span></p>
+
+            <form onsubmit="event.preventDefault(); verifyPassword();" class="space-y-4">
+                <div>
+                    <input type="password" id="teacherPasswordInput" placeholder="암호 입력 (1234)" class="w-full px-4 py-3 text-center bg-white border border-slate-300 rounded-2xl font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#eec9c9]">
+                    <p id="passwordErrorMsg" class="hidden text-xs font-bold text-rose-500 mt-2">⚠️ 암호가 올바르지 않습니다. 다시 시도해주세요.</p>
+                </div>
+                <div class="flex items-center gap-2 pt-2">
+                    <button type="button" onclick="closePasswordModal()" class="flex-1 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs rounded-xl transition-all">
+                        취소
+                    </button>
+                    <button type="submit" class="flex-1 py-2.5 bg-[#eec9c9] hover:bg-[#e5b6b6] text-slate-800 font-bold text-xs rounded-xl transition-all shadow-sm">
+                        확인
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Role Add/Edit Modal -->
+    <div id="editorModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm hidden overflow-y-auto">
+        <div class="glass-modal rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 md:p-8 relative border border-white/90 shadow-2xl my-8">
+            <button onclick="closeEditorModal()" class="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/80 hover:bg-white text-slate-600 flex items-center justify-center text-lg transition-all shadow-sm">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <h2 id="editorModalTitle" class="text-2xl font-extrabold text-slate-800 mb-6 flex items-center gap-2">
+                ✏️ 역할 정보 수정
+            </h2>
+
+            <form onsubmit="event.preventDefault(); saveRoleFromEditor();" class="space-y-5">
+                
+                <!-- Basic Options (Icon, Count, Category) -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-white/60 p-4 rounded-2xl border border-white">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">아이콘 (이모지)</label>
+                        <input type="text" id="editIcon" required class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-center text-xl font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">담당 인원 수 (명)</label>
+                        <input type="number" id="editCount" min="1" max="10" required class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-center font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">카테고리</label>
+                        <select id="editCategory" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl font-bold text-xs">
+                            <option value="alert">🔔 알림 / 도움</option>
+                            <option value="cleaning">🧹 청소 / 정리</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Multilingual Tabs/Section -->
+                <div class="space-y-4">
+                    <!-- Korean Section -->
+                    <div class="p-4 bg-blue-50/60 rounded-2xl border border-blue-100 space-y-3">
+                        <h4 class="text-xs font-extrabold text-blue-900 flex items-center gap-1.5">
+                            <span>🇰🇷</span> 한국어 정보 (필수)
+                        </h4>
+                        <div>
+                            <input type="text" id="editTitleKo" placeholder="역할 이름 (예: 쉬는 시간 알리미)" required class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-sm font-bold mb-2">
+                            <input type="text" id="editSubKo" placeholder="요약 설명 (예: 쉬는 시간 종료 알림)" required class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-medium mb-2">
+                            <textarea id="editTasksKo" rows="3" placeholder="주요 할 일 목록 (줄바꿈으로 구분)" required class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-medium mb-2"></textarea>
+                            <input type="text" id="editTipKo" placeholder="책임감 꿀팁" required class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-medium">
+                        </div>
+                    </div>
+
+                    <!-- Chinese Section -->
+                    <div class="p-4 bg-amber-50/60 rounded-2xl border border-amber-100 space-y-3">
+                        <h4 class="text-xs font-extrabold text-amber-900 flex items-center gap-1.5">
+                            <span>🇨🇳</span> 중국어 정보 (中文)
+                        </h4>
+                        <div>
+                            <input type="text" id="editTitleZh" placeholder="崗位名稱" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-sm font-bold mb-2">
+                            <input type="text" id="editSubZh" placeholder="簡短說明" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-medium mb-2">
+                            <textarea id="editTasksZh" rows="2" placeholder="主要任務 목록 (按換行區分)" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-medium mb-2"></textarea>
+                            <input type="text" id="editTipZh" placeholder="溫馨提示" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-medium">
+                        </div>
+                    </div>
+
+                    <!-- Russian Section -->
+                    <div class="p-4 bg-purple-50/60 rounded-2xl border border-purple-100 space-y-3">
+                        <h4 class="text-xs font-extrabold text-purple-900 flex items-center gap-1.5">
+                            <span>🇷🇺</span> 러시아어 정보 (Русский)
+                        </h4>
+                        <div>
+                            <input type="text" id="editTitleRu" placeholder="Название роли" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-sm font-bold mb-2">
+                            <input type="text" id="editSubRu" placeholder="Краткое описание" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-medium mb-2">
+                            <textarea id="editTasksRu" rows="2" placeholder="Задачи (каждая с новой строки)" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-medium mb-2"></textarea>
+                            <input type="text" id="editTipRu" placeholder="Совет" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-medium">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Action Buttons -->
+                <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
+                    <button type="button" onclick="closeEditorModal()" class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs rounded-xl transition-all">
+                        취소
+                    </button>
+                    <button type="submit" class="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center gap-1.5">
+                        <i class="fa-solid fa-floppy-disk"></i> 저장하기
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Application Script -->
+    <script>
+        // Initial Default Data Structure for the 15 "아자스반 의미있는 1인 1역" Roles
+        const DEFAULT_ROLES_DATA = [
+            {
+                id: 'break_bell',
+                category: 'alert',
+                count: 1,
+                icon: '🔔',
+                ko: {
+                    title: '쉬는 시간 알리미',
+                    sub: '쉬는 시간 종료 알림 & 자리에 앉기',
+                    tasks: [
+                        '쉬는 시간 끝나기 1분 전 종 3번 치기',
+                        '친구들이 제자리에 앉아 수업 준비를 하도록 도와주기'
+                    ],
+                    tip: '시계를 잘 확인하고 정시에 알람 종을 쳐서 수업 준비를 도와주세요!'
+                },
+                zh: {
+                    title: '課間提醒員',
+                    sub: '課間休息結束提醒與就座',
+                    tasks: [
+                        '課間休息結束前1分鐘敲鐘3次',
+                        '幫助同學們回到座位做好上課準備'
+                    ],
+                    tip: '注意觀察時間，準時敲響提示鐘，幫助大家做好上課準備！'
+                },
+                ru: {
+                    title: 'Оповещатель о перемене',
+                    sub: 'Конец перемены и готовность к уроку',
+                    tasks: [
+                        'За 1 минуту до конца перемены прозвонить 3 раза в звонок',
+                        'Помочь одноклассникам сесть на свои места и подготовиться к уроку'
+                    ],
+                    tip: 'Следите за временем и вовремя звоните в звонок, помогая классу собраться!'
+                }
+            },
+            {
+                id: 'tardy_alert',
+                category: 'alert',
+                count: 1,
+                icon: '⏰',
+                ko: {
+                    title: '지각 알리미',
+                    sub: '등교 시간 확인 & 결석/지각 알림',
+                    tasks: [
+                        '8시 40분까지 등교하지 않은 친구들 이름 확인하기',
+                        '선생님께 결석 및 지각 친구 알려주기'
+                    ],
+                    tip: '아침 자습 시작 전 등교 현황판을 차분하게 점검해 주세요!'
+                },
+                zh: {
+                    title: '遲到提醒員',
+                    sub: '到校時間核對與提醒',
+                    tasks: [
+                        '核對截至8點40分尚未到校的同學名單',
+                        '及時向老師報告缺席與遲到的同學名單'
+                    ],
+                    tip: '早自习开始前仔细确认出勤情况！'
+                },
+                ru: {
+                    title: 'Оповещатель об опозданиях',
+                    sub: 'Проверка времени прихода в школу',
+                    tasks: [
+                        'Отмечать ребят, не пришедших в школу к 8:40',
+                        'Сообщать учительнице имена опоздавших и отсутствующих'
+                    ],
+                    tip: 'Проверяйте список класса каждое утро перед началом утренних занятий!'
+                }
+            },
+            {
+                id: 'board_beautifier',
+                category: 'cleaning',
+                count: 1,
+                icon: '🧹',
+                ko: {
+                    title: '칠판 미화원',
+                    sub: '시간표 변경 & 칠판 청결 관리',
+                    tasks: [
+                        '① 매일 아침 요일 및 시간표 새로 바꾸기',
+                        '② 쉬는 시간마다 칠판 깨끗하게 지우기',
+                        '<매일 점심시간> 칠판 및 분필 받침대 정돈하기'
+                    ],
+                    tip: '다음 수업 선생님과 친구들을 위해 깨끗한 칠판을 준비해 주어요!'
+                },
+                zh: {
+                    title: '黑板美化員',
+                    sub: '課程表更換與黑板清潔',
+                    tasks: [
+                        '① 每日早晨更換星期和課程表板書',
+                        '② 每節課間擦乾淨黑板',
+                        '<每天午餐時間> 整理黑板及粉筆槽'
+                    ],
+                    tip: '为下一节课准备整洁干净的黑板！'
+                },
+                ru: {
+                    title: 'Дежурный по доске',
+                    sub: 'Расписание и чистота доски',
+                    tasks: [
+                        '① Каждое утро менять день недели и расписание',
+                        '② Стирать с доски на каждой перемене',
+                        '<Каждый день во время обеда> Протирать доску и подставку'
+                    ],
+                    tip: 'Заботьтесь о чистоте доски для следующего урока!'
+                }
+            },
+            {
+                id: 'recycling',
+                category: 'cleaning',
+                count: 4,
+                icon: '♻️',
+                ko: {
+                    title: '분리수거',
+                    sub: '자원 재활용 & 올바른 분리배출',
+                    tasks: [
+                        '종이, 캔, 플라스틱, 비닐, 병, 일반쓰레기 구별하여 버리기',
+                        '친구들이 분리수거 규칙을 잘 지키는지 확인하기',
+                        '가득 찬 분리수거함 비우기'
+                    ],
+                    tip: '4명의 모둠원이 역할을 나누어 바르고 안전하게 분리배출을 도와요!'
+                },
+                zh: {
+                    title: '垃圾分類員',
+                    sub: '資源回收與正確分類',
+                    tasks: [
+                        '分類扔紙張、罐頭、塑料、塑料袋、瓶子和一般垃圾',
+                        '檢查同學是否做好垃圾分類',
+                        '回收箱裝滿時及時清理'
+                    ],
+                    tip: '4名小组成员分工合作，安全做好垃圾分类！'
+                },
+                ru: {
+                    title: 'Дежурный по сортировке мусора',
+                    sub: 'Сортировка и утилизация',
+                    tasks: [
+                        'Выбрасывать бумагу, банки, пластик, пакеты, бутылки и общий мусор',
+                        'Проверять, правильно ли ребята сортируют мусор',
+                        'Опустошать заполненные баки для вторсырья'
+                    ],
+                    tip: 'Работайте вчетвером дружно и следите за чистым эко-классом!'
+                }
+            },
+            {
+                id: 'audio_visual',
+                category: 'cleaning',
+                count: 4,
+                icon: '🎬',
+                ko: {
+                    title: '시청각실 청소',
+                    sub: '점심시간 시청각실 전용 청소',
+                    tasks: [
+                        '<매일 점심시간> 교무실에서 열쇠 받아오기',
+                        '시청각실 문을 열고 내부 바닥 및 의자 정돈하기',
+                        '청소 완료 후 열쇠를 교무실에 안전하게 반납하기'
+                    ],
+                    tip: '점심시간을 활용해 시청각실을 깔끔하고 정돈된 공간으로 가꿔요!'
+                },
+                zh: {
+                    title: '視聽室清潔員',
+                    sub: '午餐時間視聽室專修清潔',
+                    tasks: [
+                        '<每天午餐時間> 從教師辦公室拿鑰匙',
+                        '打掃視聽室地面並整理座椅',
+                        '打掃完畢後及時歸還鑰匙至辦公室'
+                    ],
+                    tip: '利用午餐时间把视听室打扫得整洁舒适！'
+                },
+                ru: {
+                    title: 'Уборка аудиовизуального кабинета',
+                    sub: 'Обеденная уборка в спецкабинете',
+                    tasks: [
+                        '<Каждый день во время обеда> Брать ключ в учительской',
+                        'Подметать пол и расставлять стулья в аудиовизуальном кабинете',
+                        'Сдавать ключ обратно в учительскую после уборки'
+                    ],
+                    tip: 'Убирайте аудиовизуальный кабинет аккуратно и не забывайте сдать ключ!'
+                }
+            },
+            {
+                id: 'small_group_room',
+                category: 'cleaning',
+                count: 2,
+                icon: '🚪',
+                ko: {
+                    title: '소모임실 청소',
+                    sub: '점심시간 소모임실 쾌적 관리',
+                    tasks: [
+                        '<매일 점심시간> 소모임실 바닥 쓸기',
+                        '책상과 의자 사용 후 제자리에 배치하기',
+                        '쓰레기 줍기 및 창문 닫기'
+                    ],
+                    tip: '작은 공간이지만 깨끗하게 관리하면 공부하기 좋은 공간이 돼요!'
+                },
+                zh: {
+                    title: '小組會議室清潔員',
+                    sub: '午餐時間小組室清潔',
+                    tasks: [
+                        '<每天午餐時間> 打掃小組會議室地面',
+                        '將使用後的桌椅擺放整齊',
+                        '清理垃圾並確認窗戶已關好'
+                    ],
+                    tip: '打扫干净小小组会议室，让大家学习更顺心！'
+                },
+                ru: {
+                    title: 'Уборка кабинета для малых групп',
+                    sub: 'Чистота в малой аудитории',
+                    tasks: [
+                        '<Каждый день во время обеда> Убирать кабинет для малых групп',
+                        'Аккуратно расставлять столы и стулья после занятий',
+                        'Собирать мусор и закрывать окна'
+                    ],
+                    tip: 'Поддерживайте чистоту, чтобы в кабинете было приятно заниматься!'
+                }
+            },
+            {
+                id: 'desk_aligner',
+                category: 'cleaning',
+                count: 1,
+                icon: '📐',
+                ko: {
+                    title: '책상배열이',
+                    sub: '하교 후 교실 책상 줄 맞추기',
+                    tasks: [
+                        '<매일 하교 후> 모든 책상과 의자 줄 맞추기',
+                        '서랍 밖으로 나온 물건 정돈하기',
+                        '내일 아침을 위해 깔끔한 교실 라인 만들기'
+                    ],
+                    tip: '모든 책상이 자물쇠처럼 일직선으로 딱 맞아떨어지면 내일 아침이 기분 좋아져요!'
+                },
+                zh: {
+                    title: '書桌整列員',
+                    sub: '放學後課桌椅對齊整列',
+                    tasks: [
+                        '<每天放學後> 對齊課桌椅',
+                        '整理突出的抽屜和物品',
+                        '為明天早晨打造整齊劃一的教室环境'
+                    ],
+                    tip: '课桌椅排成一条直线，第二天早晨心情更舒畅！'
+                },
+                ru: {
+                    title: 'Организатор парт',
+                    sub: 'Выравнивание парт после уроков',
+                    tasks: [
+                        '<Каждый день после уроков> Ровно равнять ряды парт',
+                        'Задвигать выпирающие вещи и стулья',
+                        'Готовить идеальные ряды парт на следующее утро'
+                    ],
+                    tip: 'Ровные ряды парт создают отличный порядок и настроение с самого утра!'
+                }
+            },
+            {
+                id: 'class_guard',
+                category: 'alert',
+                count: 1,
+                icon: '🛡️',
+                ko: {
+                    title: '아자스반 경호원',
+                    sub: '전력 절약 & 교실 보안 관리',
+                    tasks: [
+                        '<급식시간, 전담시간> 교실 전등 끄기',
+                        'TV 전원 끄기 확인하기',
+                        '교실 문 닫기 및 출입 보안 확인'
+                    ],
+                    tip: '모두가 자리를 비울 때 에너지를 아끼고 교실을 안전하게 지키는 경호원!'
+                },
+                zh: {
+                    title: '班級安全護衛',
+                    sub: '節能與教室安全管理',
+                    tasks: [
+                        '<午餐時間、專任課時間> 關燈',
+                        '關電視并確認多媒體電源关闭',
+                        '關門保障教室安全'
+                    ],
+                    tip: '在大家离开教室时关闭电源关好门，做称职的安全护卫！'
+                },
+                ru: {
+                    title: 'Охрана класса',
+                    sub: 'Энергосбережение и безопасность',
+                    tasks: [
+                        '<Во время обеда и спецпредметов> Выключать свет',
+                        'Выключать телевизор',
+                        'Закрывать дверь класса'
+                    ],
+                    tip: 'Экономьте энергию и берегите безопасность класса, когда все уходят!'
+                }
+            },
+            {
+                id: 'homework_checker',
+                category: 'alert',
+                count: 1,
+                icon: '📝',
+                ko: {
+                    title: '숙제 알리미, 검사원',
+                    sub: '학습 과제 공지 & 수학익힘책 검사',
+                    tasks: [
+                        '영어, 과학, 수학, 도덕 숙제 / 시험, 수행평가 칠판에 적고 친구들에게 알리기',
+                        '수학익힘책 검사하기',
+                        '안내장 제출 여부 확인하기'
+                    ],
+                    tip: '칠판 알림판에 글씨를 바르고 잘 보이게 적어서 모두가 숙제를 챙기도록 도와요!'
+                },
+                zh: {
+                    title: '作業提醒與檢查員',
+                    sub: '學習任務公示與作業檢查',
+                    tasks: [
+                        '在黑板上記錄英語、科學、數學、道德作業/考試/執行評價並通知同學',
+                        '檢查數學練習冊',
+                        '確認通知單'
+                    ],
+                    tip: '将作业清晰写在黑板告示区，提醒大家按时完成！'
+                },
+                ru: {
+                    title: 'Проверка и оповещение о ДЗ',
+                    sub: 'Запись ДЗ и проверка тетрадей',
+                    tasks: [
+                        'Записывать на доске ДЗ и тесты по англ., науке, матем., ethics и сообщать ребятам',
+                        'Проверять тетради по математике',
+                        'Проверять объявления и листочки'
+                    ],
+                    tip: 'Четко записывайте задания на доске, чтобы никто ничего не забыл!'
+                }
+            },
+            {
+                id: 'digital_organizer',
+                category: 'cleaning',
+                count: 1,
+                icon: '💻',
+                ko: {
+                    title: '디지털 정리원',
+                    sub: '스마트 기기 & 충전함 정돈',
+                    tasks: [
+                        '<학교 마치고> 태블릿 PC 정리하기',
+                        '무선 키보드 수량 확인 및 정돈하기',
+                        '충전 선 정확히 연결하기'
+                    ],
+                    tip: '스마트 수업 도구를 안전하게 다루고 제자리에 고이 보관해요!'
+                },
+                zh: {
+                    title: '數碼設備整理員',
+                    sub: '平板電腦與充電櫃管理',
+                    tasks: [
+                        '<放學後> 整理平板電腦',
+                        '整理鍵盤并核對數量',
+                        '插好充電線以便正常充電'
+                    ],
+                    tip: '爱护智慧教学设备，每次用完都放回充电柜！'
+                },
+                ru: {
+                    title: 'Организатор цифровой техники',
+                    sub: 'Уход за планшетами и клавиатурами',
+                    tasks: [
+                        '<После уроков> Убирать и расставлять планшеты',
+                        'Аккуратно складывать клавиатуры',
+                        'Подключать к зарядке'
+                    ],
+                    tip: 'Аккуратно складывайте технику и ставьте ее на зарядку!'
+                }
+            },
+            {
+                id: 'bookshelf_organizer',
+                category: 'cleaning',
+                count: 1,
+                icon: '📚',
+                ko: {
+                    title: '책장 정리원',
+                    sub: '학급 문고 & 보드게임 정돈',
+                    tasks: [
+                        '학급문고 책장 종류별로 가나다 순 정리하기',
+                        '보드게임 상자 구성품 확인 및 정리하기',
+                        '채색도구 등 공용 물품 정리하기'
+                    ],
+                    tip: '친구들이 즐겁게 읽고 사용하는 학급 문고와 보드게임을 바르게 세팅해요!'
+                },
+                zh: {
+                    title: '書架整理員',
+                    sub: '班級圖書與桌遊整理',
+                    tasks: [
+                        '整理班級圖書',
+                        '整理桌遊并清點配件',
+                        '整理繪畫工具等所有書架'
+                    ],
+                    tip: '让图书角与桌游区保持整齐，方便大家随时拿取！'
+                },
+                ru: {
+                    title: 'Организатор книжных полок',
+                    sub: 'Порядок в книгах и играх',
+                    tasks: [
+                        'Наводить порядок на книжных полках: книги',
+                        'Проверять комплектность настольных игр',
+                        'Складывать принадлежности для рисования'
+                    ],
+                    tip: 'Поддерживайте идеальный порядок на книжных полках и в настольных играх!'
+                }
+            },
+            {
+                id: 'row1_cleaner',
+                category: 'cleaning',
+                count: 1,
+                icon: '🧹',
+                ko: {
+                    title: '1분단 청소',
+                    sub: '하교 후 1분단 구역 청소',
+                    tasks: [
+                        '<학교 마치고> 1분단 구역 바닥 먼지 쓸기',
+                        '1분단 책상 주변 쓰레기 정돈하기'
+                    ],
+                    tip: '1분단 친구들이 깔끔한 구역에서 공부할 수 있도록 정성껏 구석구석 씁니다!'
+                },
+                zh: {
+                    title: '第1組清潔員',
+                    sub: '放學後第1組區域清掃',
+                    tasks: [
+                        '<放學後> 清潔第1組區域',
+                        '清掃第1組課桌周圍的垃圾与灰塵'
+                    ],
+                    tip: '用心打扫第1组区域，打造干净的学习环境！'
+                },
+                ru: {
+                    title: 'Уборка 1-го ряда',
+                    sub: 'Зона 1-го ряда после уроков',
+                    tasks: [
+                        '<После уроков> Уборка 1-го ряда',
+                        'Подметание мусора и пыли под партами 1-го ряда'
+                    ],
+                    tip: 'Тщательно подметайте мусор в 1-м ряду в конце дня!'
+                }
+            },
+            {
+                id: 'row2_cleaner',
+                category: 'cleaning',
+                count: 1,
+                icon: '🧹',
+                ko: {
+                    title: '2분단 청소',
+                    sub: '하교 후 2분단 구역 청소',
+                    tasks: [
+                        '<학교 마치고> 2분단 구역 바닥 먼지 쓸기',
+                        '2분단 책상 주변 쓰레기 정돈하기'
+                    ],
+                    tip: '2분단 구역을 깨끗하게 청소해 바닥에 먼지가 없게 만들어요!'
+                },
+                zh: {
+                    title: '第2組清潔員',
+                    sub: '放學後第2組區域清掃',
+                    tasks: [
+                        '<放學後> 清潔第2組區域',
+                        '清掃第2組課桌周圍的垃圾与灰塵'
+                    ],
+                    tip: '用心打扫第2组区域，保持地面光洁！'
+                },
+                ru: {
+                    title: 'Уборка 2-го ряда',
+                    sub: 'Зона 2-го ряда после уроков',
+                    tasks: [
+                        '<После уроков> Уборка 2-го ряда',
+                        'Подметание мусора и пыли под партами 2-го ряда'
+                    ],
+                    tip: 'Убирайте 2-й ряд на совесть, заботясь о друзьях!'
+                }
+            },
+            {
+                id: 'row3_cleaner',
+                category: 'cleaning',
+                count: 1,
+                icon: '🧹',
+                ko: {
+                    title: '3분단 청소',
+                    sub: '하교 후 3분단 구역 청소',
+                    tasks: [
+                        '<학교 마치고> 3분단 구역 바닥 먼지 쓸기',
+                        '3분단 책상 주변 쓰레기 정돈하기'
+                    ],
+                    tip: '3분단 구역 바닥을 꼼꼼히 구석구석 정성스럽게 쓸어요!'
+                },
+                zh: {
+                    title: '第3組清潔員',
+                    sub: '放學後第3組區域清掃',
+                    tasks: [
+                        '<放學後> 清潔第3組區域',
+                        '清掃第3組課桌周圍的垃圾与灰塵'
+                    ],
+                    tip: '把第3组打扫得干干净净！'
+                },
+                ru: {
+                    title: 'Уборка 3-го ряда',
+                    sub: 'Зона 3-го ряда после уроков',
+                    tasks: [
+                        '<После уроков> Уборка 3-го ряда',
+                        'Подметание мусора и пыли под партами 3-го ряда'
+                    ],
+                    tip: 'Тщательно убирайте пространство 3-го ряда!'
+                }
+            },
+            {
+                id: 'front_back_cleaner',
+                category: 'cleaning',
+                count: 1,
+                icon: '✨',
+                ko: {
+                    title: '앞, 뒤 청소',
+                    sub: '하교 후 교실 앞뒤 공간 청소',
+                    tasks: [
+                        '<학교 마치고> 교실 앞쪽(칠판 앞) 쓸고 닦기',
+                        '교실 뒤쪽(사물함 앞) 쓸고 닦기',
+                        '공동 공간을 쾌적하게 마무리하기'
+                    ],
+                    tip: '교실의 얼굴인 앞쪽과 뒤쪽 공간을 닦아 반 전체에 쾌적함을 선물해요!'
+                },
+                zh: {
+                    title: '前後區域清潔員',
+                    sub: '放學後教室前後公共區域打掃',
+                    tasks: [
+                        '<放學後> 清潔教室前（黑板前）區域',
+                        '清潔教室後（儲物櫃前）區域',
+                        '保持公共空間的乾淨整潔'
+                    ],
+                    tip: '打扫教室前门与后门区域，给全班带来整洁！'
+                },
+                ru: {
+                    title: 'Уборка передней и задней части',
+                    sub: 'Зоны возле доски и шкафчиков',
+                    tasks: [
+                        '<После уроков> Уборка передней (перед доской) части',
+                        'Уборка задней (возле шкафчиков) части',
+                        'Поддержание чистоты общих пространств'
+                    ],
+                    tip: 'Убирайте переднюю и заднюю части класса для общей чистоты!'
+                }
+            }
+        ];
+
+        // UI Language Translations Object
+        const UI_TRANSLATIONS = {
+            ko: {
+                title: "아자스반 의미있는 1인 1역",
+                subtitle: "나의 책임으로 함께 만드는 멋진 우리 교실! 역할을 확인하고 책임감을 키워요 ✨",
+                searchPlaceholder: "역할 이름 검색...",
+                catAll: "전체 역할",
+                catAlert: "알림 / 도움",
+                catCleaning: "청소 / 정리",
+                myRoleBadge: "⭐ 내 역할",
+                personCountSuffix: "명",
+                setMyRole: "내 역할 선택",
+                viewDetails: "자세히 보기",
+                myRoleBannerHeader: "현재 나의 지정 역할",
+                myRoleBannerBtn: "오늘 할 일 체크",
+                modalTasksHeader: "주요 역할 및 수행할 일",
+                modalTipHeader: "6학년 책임감 꿀팁",
+                modalProgressLabel: "오늘의 역할 달성률",
+                modalSetMyRoleBtn: "이 역할이 내 역할이에요!",
+                modalRemoveMyRoleBtn: "내 역할 지정 해제",
+                modalCloseBtn: "닫기",
+                emptyTitle: "검색 결과가 없습니다.",
+                emptySub: "다른 키워드나 카테고리를 선택해 보세요!",
+                emptyResetBtn: "검색 초기화",
+                teacherToggleBtn: "교사 모드",
+                studentToggleBtn: "🔒 학생 모드",
+                teacherPanelLabel: "교사 관리 모드 활성화됨 (수정 및 삭제 가능)",
+                addRoleBtn: "새 역할 추가",
+                resetDefaultsBtn: "기본 역할로 초기화",
+                editBtn: "수정",
+                deleteBtn: "삭제",
+                applyBtn: "📝 1인 1역 신청하기",
+                applyBannerTitle: "1인 1역 희망 역할 신청하기",
+                applyBannerSub: "원하는 역할을 구글 폼으로 신청해 보세요!",
+                applyBannerBtn: "📝 신청하러 가기"
+            },
+            zh: {
+                title: "班級有意義的個人一崗位",
+                subtitle: "用各自的責任共同打造溫馨教室！確認角色并培養責任感 ✨",
+                searchPlaceholder: "搜索崗位名稱...",
+                catAll: "全部崗位",
+                catAlert: "提醒 / 協助",
+                catCleaning: "清潔 / 整理",
+                myRoleBadge: "⭐ 我的崗位",
+                personCountSuffix: "人",
+                setMyRole: "選擇為我的崗位",
+                viewDetails: "查看詳情",
+                myRoleBannerHeader: "當前我承擔的崗位",
+                myRoleBannerBtn: "檢查今日任務",
+                modalTasksHeader: "主要職責與主要任務",
+                modalTipHeader: "6年級責任小貼士",
+                modalProgressLabel: "今日任務完成度",
+                modalSetMyRoleBtn: "設為我的責任崗位！",
+                modalRemoveMyRoleBtn: "取消我的崗位",
+                modalCloseBtn: "關閉",
+                emptyTitle: "沒有找到匹配的崗位。",
+                emptySub: "請嘗試使用其他關鍵字或切換分類！",
+                emptyResetBtn: "重置搜索",
+                teacherToggleBtn: "教師模式",
+                studentToggleBtn: "🔒 學生模式",
+                teacherPanelLabel: "教師管理模式已啟用 (可編輯与刪除)",
+                addRoleBtn: "添加新崗位",
+                resetDefaultsBtn: "恢復默認崗位",
+                editBtn: "編輯",
+                deleteBtn: "刪除",
+                applyBtn: "📝 申请 1人1岗",
+                applyBannerTitle: "申请心仪的 1人1岗",
+                applyBannerSub: "通过 Google 表单申请你想要的角色！",
+                applyBannerBtn: "📝 前往申请"
+            },
+            ru: {
+                title: "Ажас Класс: Важные обязанности",
+                subtitle: "Классные обязанности и ответственность! Сделаем наш день лучше ✨",
+                searchPlaceholder: "Поиск по названию...",
+                catAll: "Все роли",
+                catAlert: "Оповещение и помощь",
+                catCleaning: "Уборка и порядок",
+                myRoleBadge: "⭐ Моя роль",
+                personCountSuffix: " чел.",
+                setMyRole: "Выбрать роль",
+                viewDetails: "Подробнее",
+                myRoleBannerHeader: "Моя текущая роль",
+                myRoleBannerBtn: "Список дел на сегодня",
+                modalTasksHeader: "Основные обязанности и задачи",
+                modalTipHeader: "Совет по ответственности",
+                modalProgressLabel: "Прогресс выполнения",
+                modalSetMyRoleBtn: "Выбрать как мою роль!",
+                modalRemoveMyRoleBtn: "Снять выбор роли",
+                modalCloseBtn: "Закрыть",
+                emptyTitle: "Ничего не найдено.",
+                emptySub: "Попробуйте изменить ключевое слово или категорию!",
+                emptyResetBtn: "Сбросить поиск",
+                teacherToggleBtn: "Режим учителя",
+                studentToggleBtn: "🔒 Режим ученика",
+                teacherPanelLabel: "Режим управления учителя активен",
+                addRoleBtn: "Добавить роль",
+                resetDefaultsBtn: "Сбросить по умолчанию",
+                editBtn: "Изменить",
+                deleteBtn: "Удалить",
+                applyBtn: "📝 Подать заявку на роль",
+                applyBannerTitle: "Заявка на желаемую роль",
+                applyBannerSub: "Заполните Google Form, чтобы выбрать роль!",
+                applyBannerBtn: "📝 Перейти к заявке"
+            }
+        };
+
+        // State Management & LocalStorage Handler
+        function loadRolesData() {
+            const saved = localStorage.getItem('my_class_roles_custom_data');
+            if (saved) {
+                try {
+                    return JSON.parse(saved);
+                } catch(e) {
+                    console.error("Failed to load custom roles data from localStorage", e);
+                }
+            }
+            return JSON.parse(JSON.stringify(DEFAULT_ROLES_DATA));
+        }
+
+        let rolesData = loadRolesData();
+        let currentLang = 'ko';
+        let currentCategory = 'all';
+        let searchQuery = '';
+        let currentMyRoleId = localStorage.getItem('my_class_role_id') || null;
+        let activeModalRoleId = null;
+        let isTeacherMode = false;
+        let editingRoleId = null;
+        
+        // Saved checklist state per role
+        let checkedTasksState = JSON.parse(localStorage.getItem('my_class_role_tasks') || '{}');
+
+        // Initialization
+        window.addEventListener('DOMContentLoaded', () => {
+            renderUI();
+            renderRoles();
+            updateMyRoleBanner();
+        });
+
+        // Save Roles to LocalStorage
+        function saveRolesData() {
+            localStorage.setItem('my_class_roles_custom_data', JSON.stringify(rolesData));
+        }
+
+        // Teacher Mode Authentication & Toggles
+        function toggleTeacherMode() {
+            if (isTeacherMode) {
+                isTeacherMode = false;
+                updateTeacherModeUI();
+                renderRoles();
+            } else {
+                document.getElementById('passwordModal').classList.remove('hidden');
+                document.getElementById('teacherPasswordInput').value = '';
+                document.getElementById('passwordErrorMsg').classList.add('hidden');
+                setTimeout(() => document.getElementById('teacherPasswordInput').focus(), 100);
+            }
+        }
+
+        function closePasswordModal() {
+            document.getElementById('passwordModal').classList.add('hidden');
+        }
+
+        function verifyPassword() {
+            const pwd = document.getElementById('teacherPasswordInput').value;
+            if (pwd === '1234') {
+                isTeacherMode = true;
+                closePasswordModal();
+                updateTeacherModeUI();
+                renderRoles();
+                triggerConfetti();
+            } else {
+                document.getElementById('passwordErrorMsg').classList.remove('hidden');
+            }
+        }
+
+        function updateTeacherModeUI() {
+            const t = UI_TRANSLATIONS[currentLang];
+            const btn = document.getElementById('teacherToggleBtn');
+            const icon = document.getElementById('teacherToggleIcon');
+            const text = document.getElementById('teacherToggleText');
+            const panel = document.getElementById('teacherControlPanel');
+
+            if (isTeacherMode) {
+                btn.className = "flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs md:text-sm font-bold transition-all bg-amber-500 text-white shadow-sm ml-1 hover:bg-amber-600";
+                icon.innerText = "🔒";
+                text.innerText = t.studentToggleBtn;
+                panel.classList.remove('hidden');
+            } else {
+                btn.className = "flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs md:text-sm font-bold transition-all bg-amber-100 text-amber-900 border border-amber-300 hover:bg-amber-200 shadow-sm ml-1";
+                icon.innerText = "⚙️";
+                text.innerText = t.teacherToggleBtn;
+                panel.classList.add('hidden');
+            }
+
+            document.getElementById('teacherPanelLabel').innerText = t.teacherPanelLabel;
+            document.getElementById('addRoleBtnText').innerText = t.addRoleBtn;
+            document.getElementById('resetDefaultsBtnText').innerText = t.resetDefaultsBtn;
+        }
+
+        // Role Add & Edit Logic
+        function openEditorModal(roleId = null) {
+            editingRoleId = roleId;
+            const modal = document.getElementById('editorModal');
+            const titleEl = document.getElementById('editorModalTitle');
+
+            if (roleId) {
+                const role = rolesData.find(r => r.id === roleId);
+                if (!role) return;
+
+                titleEl.innerText = "✏️ 역할 정보 수정";
+                document.getElementById('editIcon').value = role.icon || '⭐';
+                document.getElementById('editCount').value = role.count || 1;
+                document.getElementById('editCategory').value = role.category || 'alert';
+
+                // KO
+                document.getElementById('editTitleKo').value = role.ko?.title || '';
+                document.getElementById('editSubKo').value = role.ko?.sub || '';
+                document.getElementById('editTasksKo').value = (role.ko?.tasks || []).join('\n');
+                document.getElementById('editTipKo').value = role.ko?.tip || '';
+
+                // ZH
+                document.getElementById('editTitleZh').value = role.zh?.title || '';
+                document.getElementById('editSubZh').value = role.zh?.sub || '';
+                document.getElementById('editTasksZh').value = (role.zh?.tasks || []).join('\n');
+                document.getElementById('editTipZh').value = role.zh?.tip || '';
+
+                // RU
+                document.getElementById('editTitleRu').value = role.ru?.title || '';
+                document.getElementById('editSubRu').value = role.ru?.sub || '';
+                document.getElementById('editTasksRu').value = (role.ru?.tasks || []).join('\n');
+                document.getElementById('editTipRu').value = role.ru?.tip || '';
+            } else {
+                titleEl.innerText = "➕ 새 역할 추가";
+                document.getElementById('editIcon').value = '✨';
+                document.getElementById('editCount').value = 1;
+                document.getElementById('editCategory').value = 'alert';
+
+                document.getElementById('editTitleKo').value = '';
+                document.getElementById('editSubKo').value = '';
+                document.getElementById('editTasksKo').value = '';
+                document.getElementById('editTipKo').value = '';
+
+                document.getElementById('editTitleZh').value = '';
+                document.getElementById('editSubZh').value = '';
+                document.getElementById('editTasksZh').value = '';
+                document.getElementById('editTipZh').value = '';
+
+                document.getElementById('editTitleRu').value = '';
+                document.getElementById('editSubRu').value = '';
+                document.getElementById('editTasksRu').value = '';
+                document.getElementById('editTipRu').value = '';
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeEditorModal() {
+            document.getElementById('editorModal').classList.add('hidden');
+            editingRoleId = null;
+        }
+
+        function saveRoleFromEditor() {
+            const icon = document.getElementById('editIcon').value.trim() || '⭐';
+            const count = parseInt(document.getElementById('editCount').value) || 1;
+            const category = document.getElementById('editCategory').value;
+
+            // Tasks Parsing
+            const parseTasks = (text) => text.split('\n').map(t => t.trim()).filter(Boolean);
+
+            const koData = {
+                title: document.getElementById('editTitleKo').value.trim(),
+                sub: document.getElementById('editSubKo').value.trim(),
+                tasks: parseTasks(document.getElementById('editTasksKo').value),
+                tip: document.getElementById('editTipKo').value.trim()
+            };
+
+            const zhTitle = document.getElementById('editTitleZh').value.trim();
+            const zhData = {
+                title: zhTitle || koData.title,
+                sub: document.getElementById('editSubZh').value.trim() || koData.sub,
+                tasks: parseTasks(document.getElementById('editTasksZh').value).length > 0 ? parseTasks(document.getElementById('editTasksZh').value) : koData.tasks,
+                tip: document.getElementById('editTipZh').value.trim() || koData.tip
+            };
+
+            const ruTitle = document.getElementById('editTitleRu').value.trim();
+            const ruData = {
+                title: ruTitle || koData.title,
+                sub: document.getElementById('editSubRu').value.trim() || koData.sub,
+                tasks: parseTasks(document.getElementById('editTasksRu').value).length > 0 ? parseTasks(document.getElementById('editTasksRu').value) : koData.tasks,
+                tip: document.getElementById('editTipRu').value.trim() || koData.tip
+            };
+
+            if (editingRoleId) {
+                // Update existing
+                const index = rolesData.findIndex(r => r.id === editingRoleId);
+                if (index !== -1) {
+                    rolesData[index] = {
+                        ...rolesData[index],
+                        icon,
+                        count,
+                        category,
+                        ko: koData,
+                        zh: zhData,
+                        ru: ruData
+                    };
+                }
+            } else {
+                // Add New
+                const newRole = {
+                    id: 'custom_' + Date.now(),
+                    icon,
+                    count,
+                    category,
+                    ko: koData,
+                    zh: zhData,
+                    ru: ruData
+                };
+                rolesData.push(newRole);
+            }
+
+            saveRolesData();
+            closeEditorModal();
+            renderRoles();
+            updateMyRoleBanner();
+            triggerConfetti();
+        }
+
+        // Delete Role
+        function deleteRole(roleId) {
+            const role = rolesData.find(r => r.id === roleId);
+            if (!role) return;
+
+            const title = role[currentLang]?.title || role.ko.title;
+            if (confirm(`'${title}' 역할을 정말 삭제하시겠습니까?`)) {
+                rolesData = rolesData.filter(r => r.id !== roleId);
+                
+                if (currentMyRoleId === roleId) {
+                    currentMyRoleId = null;
+                    localStorage.removeItem('my_class_role_id');
+                }
+
+                saveRolesData();
+                renderRoles();
+                updateMyRoleBanner();
+            }
+        }
+
+        // Reset All Roles to Default
+        function confirmResetDefaults() {
+            if (confirm("모든 역할 수정을 취소하고 기본 15개 역할 리스트로 초기화하시겠습니까?")) {
+                localStorage.removeItem('my_class_roles_custom_data');
+                rolesData = JSON.parse(JSON.stringify(DEFAULT_ROLES_DATA));
+                renderRoles();
+                updateMyRoleBanner();
+                triggerConfetti();
+            }
+        }
+
+        // Set Language
+        function setLanguage(lang) {
+            currentLang = lang;
+            
+            // Update Lang Buttons
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('bg-[#eec9c9]', 'text-slate-800', 'shadow-sm');
+                btn.classList.add('text-slate-600', 'hover:bg-white/60');
+            });
+            const activeBtn = document.getElementById(`langBtn-${lang}`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-[#eec9c9]', 'text-slate-800', 'shadow-sm');
+                activeBtn.classList.remove('text-slate-600', 'hover:bg-white/60');
+            }
+
+            renderUI();
+            renderRoles();
+            updateMyRoleBanner();
+            if (isTeacherMode) updateTeacherModeUI();
+
+            if (activeModalRoleId) {
+                populateModalData(activeModalRoleId);
+            }
+        }
+
+        // Render Static UI Labels based on selected language
+        function renderUI() {
+            const t = UI_TRANSLATIONS[currentLang];
+            document.getElementById('appTitle').innerText = t.title;
+            document.getElementById('appSubtitle').innerText = t.subtitle;
+            document.getElementById('searchInput').placeholder = t.searchPlaceholder;
+            
+            document.getElementById('cat-all').innerText = t.catAll;
+            document.getElementById('cat-alert').innerText = t.catAlert;
+            document.getElementById('cat-cleaning').innerText = t.catCleaning;
+
+            document.getElementById('myRoleBannerHeader').innerText = t.myRoleBannerHeader;
+            document.getElementById('myRoleBannerBtn').innerText = t.myRoleBannerBtn;
+
+            document.getElementById('modalTasksTitle').innerHTML = `<i class="fa-solid fa-clipboard-check text-[#eec9c9]"></i> ${t.modalTasksHeader}`;
+            document.getElementById('modalTipHeader').innerHTML = `<i class="fa-solid fa-lightbulb"></i> ${t.modalTipHeader}`;
+            document.getElementById('modalProgressLabel').innerText = t.modalProgressLabel;
+            document.getElementById('modalCloseBtnText').innerText = t.modalCloseBtn;
+
+            document.getElementById('emptyStateTitle').innerText = t.emptyTitle;
+            document.getElementById('emptyStateSub').innerText = t.emptySub;
+            document.getElementById('emptyStateResetBtn').innerText = t.emptyResetBtn;
+
+            if (document.getElementById('applyFormHeaderBtnText')) document.getElementById('applyFormHeaderBtnText').innerText = t.applyBtn;
+            if (document.getElementById('applyBannerTitle')) document.getElementById('applyBannerTitle').innerText = t.applyBannerTitle;
+            if (document.getElementById('applyBannerSub')) document.getElementById('applyBannerSub').innerText = t.applyBannerSub;
+            if (document.getElementById('applyBannerBtnText')) document.getElementById('applyBannerBtnText').innerText = t.applyBannerBtn;
+        }
+
+        // Filter Roles List
+        function getFilteredRoles() {
+            return rolesData.filter(role => {
+                const langData = role[currentLang] || role.ko;
+                const matchesCategory = (currentCategory === 'all' || role.category === currentCategory);
+                
+                const matchesSearch = !searchQuery || 
+                    (langData.title && langData.title.toLowerCase().includes(searchQuery)) ||
+                    (langData.sub && langData.sub.toLowerCase().includes(searchQuery)) ||
+                    (langData.tasks && langData.tasks.some(t => t.toLowerCase().includes(searchQuery)));
+
+                return matchesCategory && matchesSearch;
+            });
+        }
+
+        // Render Role Cards Grid
+        function renderRoles() {
+            const container = document.getElementById('rolesGrid');
+            const emptyState = document.getElementById('emptyState');
+            const filtered = getFilteredRoles();
+
+            if (filtered.length === 0) {
+                container.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+            container.innerHTML = '';
+
+            const t = UI_TRANSLATIONS[currentLang];
+
+            filtered.forEach(role => {
+                const langData = role[currentLang] || role.ko;
+                const isMyRole = (currentMyRoleId === role.id);
+
+                const card = document.createElement('div');
+                card.className = `glass-card rounded-3xl p-6 flex flex-col justify-between relative overflow-hidden group ${isMyRole ? 'my-role-active' : ''}`;
+                
+                card.innerHTML = `
+                    <div>
+                        <!-- Teacher Controls Overlay (Visible in Teacher Mode) -->
+                        ${isTeacherMode ? `
+                            <div class="flex items-center justify-end gap-1.5 mb-3 pb-2 border-b border-amber-200/60">
+                                <button onclick="openEditorModal('${role.id}')" class="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-lg transition-all shadow-sm flex items-center gap-1">
+                                    <i class="fa-solid fa-pen"></i> ${t.editBtn}
+                                </button>
+                                <button onclick="deleteRole('${role.id}')" class="px-2.5 py-1 bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs rounded-lg transition-all shadow-sm flex items-center gap-1">
+                                    <i class="fa-solid fa-trash"></i> ${t.deleteBtn}
+                                </button>
+                            </div>
+                        ` : ''}
+
+                        <!-- Header Icon & Badges -->
+                        <div class="flex items-start justify-between gap-3 mb-4">
+                            <div class="w-14 h-14 rounded-2xl bg-white/80 border border-white flex items-center justify-center text-3xl shadow-sm group-hover:scale-110 transition-transform">
+                                ${role.icon}
+                            </div>
+                            <div class="flex flex-col items-end gap-1.5">
+                                ${isMyRole ? `
+                                    <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-[#eec9c9] text-slate-800 border border-white shadow-sm animate-pulse">
+                                        ${t.myRoleBadge}
+                                    </span>
+                                ` : ''}
+                                <span class="px-3 py-1 rounded-full text-xs font-bold bg-pink-100/90 text-pink-800 border border-[#eec9c9] shadow-sm">
+                                    👤 ${role.count}${t.personCountSuffix}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Role Title & Summary -->
+                        <h3 class="text-xl font-extrabold text-slate-800 mb-1 group-hover:text-blue-900 transition-colors">
+                            ${langData.title}
+                        </h3>
+                        <p class="text-xs font-medium text-slate-500 mb-4 line-clamp-1">
+                            ${langData.sub}
+                        </p>
+
+                        <!-- First Tasks Preview -->
+                        <ul class="space-y-1.5 mb-6 text-xs text-slate-700 font-medium">
+                            ${(langData.tasks || []).slice(0, 2).map(task => `
+                                <li class="flex items-center gap-2 truncate">
+                                    <i class="fa-solid fa-check text-[#eec9c9] text-[10px]"></i>
+                                    <span class="truncate">${task}</span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+
+                    <!-- Bottom Buttons -->
+                    <div class="flex items-center gap-2 pt-3 border-t border-white/60">
+                        <button onclick="openRoleDetail('${role.id}')" class="flex-1 py-2.5 px-3 bg-white/70 hover:bg-white text-slate-800 font-bold text-xs rounded-xl border border-white shadow-sm transition-all flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-eye"></i> ${t.viewDetails}
+                        </button>
+                        <button onclick="toggleMyRole('${role.id}')" title="${t.setMyRole}" class="w-10 h-10 rounded-xl ${isMyRole ? 'bg-[#eec9c9] text-slate-800' : 'bg-white/40 text-slate-400 hover:text-amber-500 hover:bg-white'} border border-white flex items-center justify-center text-sm transition-all shadow-sm">
+                            <i class="fa-solid fa-star"></i>
+                        </button>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        // Update Top Banner for My Role
+        function updateMyRoleBanner() {
+            const banner = document.getElementById('myRoleBanner');
+            if (!currentMyRoleId) {
+                banner.classList.add('hidden');
+                return;
+            }
+
+            const role = rolesData.find(r => r.id === currentMyRoleId);
+            if (!role) {
+                banner.classList.add('hidden');
+                return;
+            }
+
+            const langData = role[currentLang] || role.ko;
+            const t = UI_TRANSLATIONS[currentLang];
+            document.getElementById('myRoleBannerTitle').innerText = `${role.icon} ${langData.title} (${role.count}${t.personCountSuffix}) - ${langData.sub}`;
+            banner.classList.remove('hidden');
+        }
+
+        function populateModalData(roleId) {
+            const role = rolesData.find(r => r.id === roleId);
+            if (!role) return;
+
+            const langData = role[currentLang] || role.ko;
+            const t = UI_TRANSLATIONS[currentLang];
+
+            document.getElementById('modalIconContainer').innerText = role.icon;
+            document.getElementById('modalRoleTitle').innerText = langData.title;
+            document.getElementById('modalCountBadge').innerText = `👤 ${role.count}${t.personCountSuffix}`;
+            
+            const catMap = {
+                alert: t.catAlert,
+                cleaning: t.catCleaning
+            };
+            document.getElementById('modalCategoryBadge').innerText = catMap[role.category] || t.catAll;
+            document.getElementById('modalTipBody').innerText = langData.tip;
+
+            // Render Interactive Tasks Checklist
+            const tasksContainer = document.getElementById('modalTasksList');
+            tasksContainer.innerHTML = '';
+
+            const roleTaskState = checkedTasksState[roleId] || [];
+
+            (langData.tasks || []).forEach((taskText, index) => {
+                const isChecked = !!roleTaskState[index];
+                const taskRow = document.createElement('label');
+                taskRow.className = `flex items-center gap-3 p-3.5 rounded-2xl bg-white/60 hover:bg-white/90 border border-white/80 cursor-pointer transition-all ${isChecked ? 'line-through opacity-75 bg-emerald-50/60' : ''}`;
+                
+                taskRow.innerHTML = `
+                    <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleTaskCheck('${roleId}', ${index}, this)" class="custom-checkbox w-5 h-5 rounded-lg border-2 border-slate-300 text-[#eec9c9] focus:ring-[#eec9c9] cursor-pointer accent-[#eec9c9]">
+                    <span class="text-sm font-semibold text-slate-800 ${isChecked ? 'text-slate-500' : ''}">${taskText}</span>
+                `;
+                tasksContainer.appendChild(taskRow);
+            });
+
+            updateProgress(roleId);
+            updateModalMyRoleButton();
+        }
+
+        function updateProgress(roleId) {
+            const role = rolesData.find(r => r.id === roleId);
+            if (!role) return;
+
+            const langData = role[currentLang] || role.ko;
+            const total = (langData.tasks || []).length;
+            if (total === 0) return;
+
+            const roleTaskState = checkedTasksState[roleId] || [];
+            const completedCount = roleTaskState.filter(Boolean).length;
+            const percent = Math.round((completedCount / total) * 100);
+
+            document.getElementById('modalProgressPercent').innerText = `${percent}% (${completedCount}/${total})`;
+            document.getElementById('modalProgressBar').style.width = `${percent}%`;
+
+            if (percent === 100 && completedCount > 0) {
+                triggerConfetti();
+            }
+        }
+
+        function updateModalMyRoleButton() {
+            const t = UI_TRANSLATIONS[currentLang];
+            const btn = document.getElementById('modalMyRoleToggleBtn');
+            const btnText = document.getElementById('modalMyRoleBtnText');
+
+            const isMyRole = (currentMyRoleId === activeModalRoleId);
+
+            if (isMyRole) {
+                btn.className = "w-full sm:w-auto px-5 py-3 rounded-2xl font-bold text-sm transition-all flex items-center justify-center gap-2 bg-slate-800 text-white hover:bg-slate-700 shadow-sm";
+                btnText.innerText = t.modalRemoveMyRoleBtn;
+            } else {
+                btn.className = "w-full sm:w-auto px-5 py-3 rounded-2xl font-bold text-sm transition-all flex items-center justify-center gap-2 bg-[#eec9c9] text-slate-800 hover:bg-[#e5b6b6] shadow-sm";
+                btnText.innerText = t.modalSetMyRoleBtn;
+            }
+        }
+
+        // Celebration Confetti Animations
+        function triggerConfetti() {
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 60,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#add8eb', '#eec9c9', '#ffffff', '#fbbf24']
+                });
+            }
+        }
+
+        function triggerMicroConfetti(element) {
+            if (typeof confetti === 'function') {
+                const rect = element.getBoundingClientRect();
+                const x = (rect.left + rect.width / 2) / window.innerWidth;
+                const y = (rect.top + rect.height / 2) / window.innerHeight;
+
+                confetti({
+                    particleCount: 25,
+                    spread: 40,
+                    startVelocity: 15,
+                    origin: { x, y },
+                    colors: ['#eec9c9', '#add8eb', '#f43f5e']
+                });
+            }
+        }
+    </script>
+</body>
+</html>
